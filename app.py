@@ -8,7 +8,8 @@ import os
 import time
 
 # Set page title and layout
-st.set_page_config(page_title="Excel File Processor", layout="wide")
+st.set_page_config(page_title="RSCS Pricing Tool", layout="wide")
+
 
 # Function to create a download link for a file
 def get_download_link(file_path, file_name, text):
@@ -31,76 +32,81 @@ def get_binary_file_downloader_html(bin_file, file_name, text):
 def process_excel(uploaded_file, progress_bar):
     # Update progress
     progress_bar.progress(10, text="Reading input file...")
-    time.sleep(0.5)  # Small delay to show progress
+    # time.sleep(0.5)  # Small delay to show progress
     
-    # Define your column mapping (same as in your provided code)
+    # Define your updated column mapping
     columns_mapping = {
-    'Proprietary': 1,
-    'National Account Manager': 2,
-    'Business Analyst': 3,
-    'Project #': 4,
-    # 'Add or Change Date'
-    'Category': 6,
-    'Sub Category': 7,
-    'Manufacturer': 12,
-    'Vendor Ship City for KINEXO Landed #1': 13,
-    'Ship State': 14,
-    'Ship Zip': 15,
-    'Country of Origin': 16,
-    'Description': 18,
-    'Manufacturer Item #': 19,
-    'Brand Item#': 20,
-    'DC Xref#': 21,
-    'GTIN': 22,
-    'UPC': 23,
-    'Inbound Price Begins': 24,
-    'Inbound Price Expires': 25,
-    'Vendor Pricing Date': 26,
-    'Pack': 27,
-    'Size': 28,
-    'Ti': 29,
-    'Hi': 30,
-    'Double-Stacked': 32,
-    'Net Wt': 33,
-    'Gross Wt': 34,
-    'Case Length': 36,
-    'Case Width': 37,
-    'Case Height': 38,
-    'Section': 39,
-    'Shelf Life': 40,
-    'SHELF LIFE GUARANTEED TO KINEXO (DAYS)': 41,
-    'SHELF LIFE GUARANTEED TO DC (DAYS)': 42,
-    'DATE ON CASE (MFTR OR EXPIRED OR BEST BY)': 43,
-    'EXAMPLE OF DATE': 44,
-    'EXPLANATION OF DATE': 45,
-    # 'KINEXO ReD WH': 46,
-    # 'KINEXO Location #1': 47,
-    'Manf FOB #1': 48,
-    'Pallet Charge ($/pallet)': 61,
-    'Vendor Delivered $ to KINEXO': 81,
-    'DC #': 128,
-    'DC Name_y': 129,
-    'DC City': 130,
-    'DC State': 131,
-    'DC Zip': 132,
-    'Monthly Case Volume': 134,
-    'Lead Time (Days)': 150,
-    'Item MOQ': 151,
-    'Floor Load': 152,
-    'Buyer': 155
+        'Proprietary': 1,
+        'National Account Manager': 2,
+        'Business Analyst': 3,
+        'Project #': 4,
+        'Add or Change Date': 5,
+        'Category': 6,
+        'Sub Category': 7,
+        'Manufacturer': 12,
+        'Vendor Ship City for KINEXO Landed #1': 13,
+        'Ship State': 14,
+        'Ship Zip': 15,
+        'Country of Origin': 16,
+        'Contract Holder': 17,
+        'Description': 18,
+        'Manufacturer Item #': 19,
+        'Brand Item#': 20,
+        'DC Xref#': 21,
+        'GTIN': 22,
+        'UPC': 23,
+        'Inbound Price Begins': 24,
+        'Inbound Price Expires': 25,
+        'Vendor Pricing Date': 26,
+        'Pack': 27,
+        'Size': 28,
+        'Ti': 29,
+        'Hi': 30,
+        'Double-Stacked': 32,
+        'Net Wt': 33,
+        'Gross Wt': 34,
+        'Case Length': 36,
+        'Case Width': 37,
+        'Case Height': 38,
+        'Section': 39,
+        'Shelf Life': 40,
+        'SHELF LIFE GUARANTEED TO KINEXO (DAYS)': 41,
+        'SHELF LIFE GUARANTEED TO DC (DAYS)': 42,
+        'DATE ON CASE (MFTR OR EXPIRED OR BEST BY)': 43,
+        'EXAMPLE OF DATE': 44,
+        'EXPLANATION OF DATE': 45,
+        'KINEXO ReD WH': 46,
+        'Manf FOB #1': 48,
+        'Pallet Charge ($/pallet)': 61,
+        'Vendor Delivered $ to KINEXO': 81,
+        'Pallet Charge ($/pallet)': 90,
+        'Corp Funding %': 99,
+        'Outbound Price Begins': 106,
+        'OtB Frt $/Cs': 123,
+        'Standard Analysis Y/N': 125,
+        'National Delievered': 126,
+        'DC #': 128,
+        'DC Name_x': 129,
+        'DC City': 130,
+        'DC State': 131,
+        'DC Zip': 132,
+        'Monthly Case Volume': 134,
+        'Lead Time (Days)': 150,
+        'Item MOQ': 151,
+        'Floor Load': 152,
+        # 'Buyer': 155
     }
     
     # Create a BytesIO buffer to store the uploaded file
     uploaded_file_buffer = io.BytesIO(uploaded_file.read())
     
     # Update progress
-    progress_bar.progress(30, text="Reading sheets...")
+    progress_bar.progress(20, text="Reading sheets...")
     time.sleep(0.5)
     
     # Read the different sheets from the uploaded file
     try:
         Project_df = pd.read_excel(uploaded_file_buffer, sheet_name="Project Table")
-        # Reset the buffer position
         uploaded_file_buffer.seek(0)
         
         Vendor_df = pd.read_excel(uploaded_file_buffer, sheet_name="Vendor Table")
@@ -110,17 +116,51 @@ def process_excel(uploaded_file, progress_bar):
         uploaded_file_buffer.seek(0)
         
         Demand_df = pd.read_excel(uploaded_file_buffer, sheet_name="Demand Table")
+        uploaded_file_buffer.seek(0)
+        
+        SupplierCapabilities_df = pd.read_excel(uploaded_file_buffer, sheet_name="Vendor Product & Pricing Table")
+        uploaded_file_buffer.seek(0)
+        
+        CustomerDCs_df = pd.read_excel(uploaded_file_buffer, sheet_name="Customer DC Combinations")
+        uploaded_file_buffer.seek(0)
+        
+        Analyst_Inputs_df = pd.read_excel(uploaded_file_buffer, sheet_name="Analysts_Inputs")
+        uploaded_file_buffer.seek(0)
+        
     except Exception as e:
-        raise Exception(f"Error reading sheets from the uploaded file: {e}. Make sure your file has all required sheets: 'Project Table', 'Vendor Table', 'Item Spec Table', and 'Demand Table'.")
+        raise Exception(f"Error reading sheets from the uploaded file: {e}. Make sure your file has all required sheets: 'Project Table', 'Vendor Table', 'Item Spec Table', 'Demand Table', 'Vendor Product & Pricing Table', 'Customer DC Combinations', and 'Analyst_Inputs_dfs'.")
     
     # Update progress
-    progress_bar.progress(50, text="Processing data...")
+    progress_bar.progress(40, text="Processing data...")
     time.sleep(0.5)
     
-    # Perform data processing (matching your custom logic)
-    combined_df = (Vendor_df.merge(Item_df, how="cross")).merge(Demand_df, how="left", on="Brand Item#")
-    combined_df[['National Account Manager', 'Business Analyst', 'Project #', 'Concept', 'Brand Name']] = Project_df[['National Account Manager', 'Business Analyst', 'Project #', 'Category', 'Sub Category']].iloc[0]
+    # Perform data processing with your updated merge logic
+    combined_df = (Project_df.merge(Item_df, how='cross')
+                   .merge(SupplierCapabilities_df, how='left', on='Brand Item#')
+                   .merge(CustomerDCs_df, how='left', on=['Category', 'Sub Category', 'Section', 'CAW Used2', 'KINEXO ReD WH'])
+                   .merge(Vendor_df, how='left', on=['Manufacturer', 'Vendor Ship City for KINEXO Landed #1', 'Ship State'])
+                   .merge(Demand_df, how='left', on=['DC #', 'Brand Item#']))
     
+    # Update progress
+    progress_bar.progress(55, text="Filtering and sorting data...")
+    time.sleep(0.5)
+    
+    # Apply data filtering and sorting
+    combined_df['Monthly Case Volume'] = combined_df['Monthly Case Volume'].fillna(0)
+    combined_df = combined_df[combined_df['Monthly Case Volume'] > 0]
+    combined_df = combined_df.sort_values(['Manufacturer', 'Manufacturer Item #', 'Vendor Ship City for KINEXO Landed #1'], ascending=True)
+    
+    combined_df['Vendor Program'] = Analyst_Inputs_df['Vendor Program'].iloc[0]
+    combined_df['KINEXO #'] = Analyst_Inputs_df['KINEXO #'].iloc[0]
+    combined_df['Vendor#'] = Analyst_Inputs_df['Vendor#'].iloc[0]
+    combined_df['Add or Change Date'] = Analyst_Inputs_df['Add or Change Date'].iloc[0]
+    combined_df['Contract Holder'] = Analyst_Inputs_df['Contract Holder'].iloc[0]
+    # combined_df['KINEXO Warehouse #1'] = Analyst_Inputs_df['KINEXO Warehouse #1'].iloc[0]
+    combined_df['Corp Funding %'] = Analyst_Inputs_df['Corp Funding %'].iloc[0]
+    combined_df['Outbound Price Begins'] = Analyst_Inputs_df['Outbound Price Begins'].iloc[0]
+    combined_df['Standard Analysis Y/N'] = Analyst_Inputs_df['Standard Analysis Y/N'].iloc[0]
+    combined_df['National Delivered'] = Analyst_Inputs_df['National Delivered'].iloc[0]
+
     # Update progress
     progress_bar.progress(70, text="Loading template...")
     time.sleep(0.5)
@@ -150,7 +190,7 @@ def process_excel(uploaded_file, progress_bar):
             
             # Write the values into the respective column in the Excel sheet
             for idx, value in enumerate(column_to_copy, start=start_row):
-                ws.cell(row=idx, column=excel_col, value=value)
+                ws.cell(row=idx, column=excel_col, value="NA" if pd.isna(value) else value)
         else:
             st.warning(f"Column '{column_name}' not found in the processed data. Skipping this column.")
     
@@ -194,7 +234,7 @@ def main():
     
     # Header with company logo
     st.markdown('<div class="main-header">', unsafe_allow_html=True)
-    st.title("Excel Data Processor")
+    st.title("RSCS Pricing Tool")
     st.markdown('</div>', unsafe_allow_html=True)
     
     # Company logo
@@ -207,7 +247,7 @@ def main():
     if os.path.exists(logo_path):
         st.image(logo_path, width=200)
     else:
-        st.info("Place your logo.png/ logo.jpg file in the same directory as this app.")
+        st.info("Place your logo.png file in the same directory as this app.")
     
     st.markdown('</div>', unsafe_allow_html=True)
     
